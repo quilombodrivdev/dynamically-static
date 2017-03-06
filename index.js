@@ -1,14 +1,15 @@
 var express = require('express'),
-    bodyParser = require('body-parser')
-fs = require('fs')
-app = express(),
+    bodyParser = require('body-parser'),
+    fs = require('fs'),
+    mkdirp = require('mkdirp'),
+    app = express(),
     config = {
         server: {
             ip: "127.0.0.1",
             port: "3500"
         },
         site: {
-            dist: "/_data/comments/"
+            dist: "_data/comments/"
         }
     };
 
@@ -22,16 +23,30 @@ app.listen(config.server.port, config.server.ip, function() {
 
 app.post('/post/comment', function(req, res) {
     var entry = req.body;
+    console.log(req.body);
     var hash = new Date().getTime().toString();
-    var distFile = config.site.dist + entry.slug + "/" + hash + ".yml";
-    //fs.writeFile("", "Hey there!", function(err) {
-        //if (err) {
-            //return console.log(err);
-        //}
+    var distFolder = config.site.dist + entry.slug + "/";
+    var distFile = distFolder + hash + ".yml";
+    var data = "";
+    for (var key in entry) {
+        data += key + ":" + " " + entry[key] + " \n";
+    }
 
-        //console.log("The file was saved!");
-    //});
-    res.json({
-        data: "success"
-    });
+    mkdirp(distFolder, function(err) {
+        if (err) res.json({
+            data: "error"
+        });
+
+        fs.writeFile(distFile, data, function(err) {
+            if (err) {
+                return console.log(err);
+            }
+
+            res.json({
+                data: "success"
+            });
+        });
+
+    })
+
 });
