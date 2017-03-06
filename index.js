@@ -12,7 +12,6 @@ app.listen(config.port,config.ip, function(){
     console.log('server listening on:' , config.port, config.ip);
 });
 
-
 app.post('/post/comment', function(req,res){
     console.log(req.body);
     res.json({data:'success'});
