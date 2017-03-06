@@ -1,0 +1,28 @@
+{
+  "name": "dynamically-static",
+  "version": "1.0.0",
+  "description": "Dynamic content in your static site",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quilombodrivdev/dynamically-static.git"
+  },
+  "keywords": [
+    "jekyll",
+    "dynamic",
+    "static"
+  ],
+  "author": "Alan Campora <alan.campora@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/quilombodrivdev/dynamically-static/issues"
+  },
+  "homepage": "https://github.com/quilombodrivdev/dynamically-static#readme",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2"
+  }
+}
