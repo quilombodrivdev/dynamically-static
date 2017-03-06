@@ -23,7 +23,6 @@ app.listen(config.server.port, config.server.ip, function() {
 
 app.post('/post/comment', function(req, res) {
     var entry = req.body;
-    console.log(req.body);
     var hash = new Date().getTime().toString();
     var distFolder = config.site.dist + entry.slug + "/";
     var distFile = distFolder + hash + ".yml";
@@ -32,21 +31,26 @@ app.post('/post/comment', function(req, res) {
         data += key + ":" + " " + entry[key] + " \n";
     }
 
-    mkdirp(distFolder, function(err) {
-        if (err) res.json({
-            data: "error"
+    this._fileCreation(distFolder, distFile, data)
+        .then(function(){
+            console.log("file successfully created"); 
+
+            res.json({"success":"success"});
         });
-
-        fs.writeFile(distFile, data, function(err) {
-            if (err) {
-                return console.log(err);
-            }
-
-            res.json({
-                data: "success"
-            });
-        });
-
-    })
 
 });
+
+_fileCreation = function(distFolder, distFile, data) {
+    return new Promise(function(resolve, reject) {
+        mkdirp(distFolder, function(err) {
+            if (err) reject("file creation"); 
+
+            fs.writeFile(distFile, data, function(err) {
+                if (err) reject("file writing");
+
+                resolve();
+            });
+
+        });
+    })
+}
