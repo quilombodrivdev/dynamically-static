@@ -4,7 +4,8 @@
   "description": "Dynamic content in your static site",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1", 
+    "shjs": "node_modules/shelljs/bin/shjs"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
   "dependencies": {
     "body-parser": "^1.17.1",
     "express": "^4.15.2",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "shelljs": "^0.7.6"
   }
 }
