@@ -2,9 +2,11 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     fs = require('fs'),
     mkdirp = require('mkdirp'),
-    shjs = require('shelljs/global'),
+    shjs = require('shelljs'),
     app = express(),
+    exec = require('sync-exec'),
     config = {
+        repoFolder: "repo",
         server: {
             ip: "127.0.0.1",
             port: "3500"
@@ -13,9 +15,11 @@ var express = require('express'),
             dist: "_data/comments/"
         },
         git: {
+            token: "",
             username: "alancampora",
             email: "alan.campora@gmail.com",
             repo: "quilombodrivdev/quilombodrivdev.github.io.git",
+            repoName: "quilombodrivdev.github.io",
             branch: "comments",
             remote: "blog",
             commitMessage: "New comment - medusa integration"
@@ -27,8 +31,34 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.listen(config.server.port, config.server.ip, function() {
-    console.log('server listening on:', config.server.port, config.server.ip);
+    console.log('server listening on:', config.server.port, config.server.ip)
+    getToken()
+        .then(function(data) {
+            config.git.token = data
+            clone()
+        })
 });
+
+function clone() {
+    shjs.cd('./repo');
+    execPromise('cd', config.git.repoName)
+        .then(function(data) {
+            shjs.echo('repo is alredy cloned')
+        })
+        .catch(function(error) {
+            shjs.echo('cloning repo')
+            return execPromise('git', 'clone https://' + config.git.username + ':' + config.git.token + '@github.com/' + config.git.repo)
+        })
+}
+
+function execPromise(command, props) {
+    return new Promise(function(resolve, reject) {
+        shjs.exec(command + ' ' + props, function(code, out, err) {
+            if (code === 1) reject(err)
+            resolve(out);
+        })
+    })
+}
 
 app.post('/post/comment', function(req, res) {
     var entry = req.body;
@@ -73,7 +103,7 @@ _fileCreation = function(distFolder, distFile, data) {
     })
 };
 
-_git = function(file) {
+git = function(file) {
     this._getToken()
         .then(function(token) {
             console.log('this is the tokeeen:', token);
@@ -82,7 +112,7 @@ _git = function(file) {
 
 };
 
-_getToken = function() {
+getToken = function() {
     return new Promise(function(resolve, reject) {
         fs.readFile(".gittoken", 'utf8', function(err, data) {
             if (err) reject(err);
