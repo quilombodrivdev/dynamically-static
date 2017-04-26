@@ -12,7 +12,7 @@ var express = require('express'),
             port: "3500"
         },
         site: {
-            dist: "_data/comments/"
+            dist: this.repoFolder + "/" + this.repoName + "/_data/comments/"
         },
         git: {
             token: "",
@@ -20,8 +20,7 @@ var express = require('express'),
             email: "alan.campora@gmail.com",
             repo: "quilombodrivdev/quilombodrivdev.github.io.git",
             repoName: "quilombodrivdev.github.io",
-            branch: "comments",
-            remote: "blog",
+            branch: "new-comments-test",
             commitMessage: "New comment - medusa integration"
         }
     };
@@ -41,14 +40,25 @@ app.listen(config.server.port, config.server.ip, function() {
 
 function clone() {
     shjs.cd('./repo');
-    execPromise('cd', config.git.repoName)
-        .then(function(data) {
-            shjs.echo('repo is alredy cloned')
+    execPromise('git', 'clone ' + repoURL())
+        .then(function() {
+            shjs.echo('config user.email');
+            return execPromise('git', 'config user.email ' + config.git.email)
         })
-        .catch(function(error) {
-            shjs.echo('cloning repo')
-            return execPromise('git', 'clone https://' + config.git.username + ':' + config.git.token + '@github.com/' + config.git.repo)
+        .then(function() {
+            shjs.echo('config user.name');
+            return execPromise('git', 'config user.name ' + config.git.username)
         })
+        .then(function() {
+            shjs.echo('repo setup done')
+        })
+        .catch(function(err) {
+            shjs.echo('error:' + err)
+        })
+}
+
+function repoURL() {
+    return 'https://' + config.git.username + ':' + config.git.token + '@github.com/' + config.git.repo
 }
 
 function execPromise(command, props) {
@@ -58,6 +68,15 @@ function execPromise(command, props) {
             resolve(out);
         })
     })
+}
+
+function getToken() {
+    return new Promise(function(resolve, reject) {
+        fs.readFile(".gittoken", 'utf8', function(err, data) {
+            if (err) reject(err);
+            resolve(data.replace(/(?:\r\n|\r|\n)/g, ''));
+        })
+    });
 }
 
 app.post('/post/comment', function(req, res) {
@@ -70,7 +89,7 @@ app.post('/post/comment', function(req, res) {
         data += key + ":" + " " + entry[key] + " \n";
     }
 
-    this._fileCreation(distFolder, distFile, data)
+    this.fileCreation(distFolder, distFile, data)
         .then(function() {
             this._git(distFile);
         }.bind(this))
@@ -88,7 +107,7 @@ app.post('/post/comment', function(req, res) {
 
 });
 
-_fileCreation = function(distFolder, distFile, data) {
+function fileCreation(distFolder, distFile, data) {
     return new Promise(function(resolve, reject) {
         mkdirp(distFolder, function(err) {
             if (err) reject("file creation");
@@ -103,32 +122,13 @@ _fileCreation = function(distFolder, distFile, data) {
     })
 };
 
-git = function(file) {
-    this._getToken()
-        .then(function(token) {
-            console.log('this is the tokeeen:', token);
-            return this._submitPullRequest(file, token);
-        });
 
-};
-
-getToken = function() {
-    return new Promise(function(resolve, reject) {
-        fs.readFile(".gittoken", 'utf8', function(err, data) {
-            if (err) reject(err);
-            resolve(data.replace(/(?:\r\n|\r|\n)/g, ''));
-        })
-    });
-}
-_submitPullRequest = function(file, token) {
+submitPullRequest = function(file) {
     return new Promise(function(resolve, reject) {
 
         console.log('this is a file', file);
-        var gitOrigin = "https://" + config.git.username + ":" + token + "@github.com/" + config.git.repo;
+        var gitOrigin = repoURL()
 
-        exec('git config user.name ' + config.git.username);
-        exec('git config user.email ' + config.git.email);
-        exec('git remote add ' + config.git.remote + ' ' + gitOrigin);
         exec('git pull ' + config.git.remote + ' ' + config.git.branch);
         exec('git checkout ' + config.git.branch);
         exec('git add ' + file);
