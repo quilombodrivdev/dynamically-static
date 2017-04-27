@@ -5,25 +5,9 @@ var express = require('express'),
     shjs = require('shelljs'),
     app = express(),
     exec = require('sync-exec'),
-    config = {
-        repoFolder: "repo",
-        server: {
-            ip: "127.0.0.1",
-            port: "3500"
-        },
-        site: {
-            dist: this.repoFolder + "/" + this.repoName + "/_data/comments/"
-        },
-        git: {
-            token: "",
-            username: "alancampora",
-            email: "alan.campora@gmail.com",
-            repo: "quilombodrivdev/quilombodrivdev.github.io.git",
-            repoName: "quilombodrivdev.github.io",
-            branch: "new-comments-test",
-            commitMessage: "New comment - medusa integration"
-        }
-    };
+    crypto = require('crypto'),
+    config = require('./config.json');
+
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -39,11 +23,14 @@ app.listen(config.server.port, config.server.ip, function() {
 });
 
 function clone() {
-    shjs.cd('./repo');
+    shjs.cd(config.repoFolder)
     execPromise('git', 'clone ' + repoURL())
         .then(function() {
             shjs.echo('config user.email');
             return execPromise('git', 'config user.email ' + config.git.email)
+        })
+        .then(function() {
+            return shjs.cd(config.git.repoName);
         })
         .then(function() {
             shjs.echo('config user.name');
@@ -54,6 +41,7 @@ function clone() {
         })
         .catch(function(err) {
             shjs.echo('error:' + err)
+            shjs.cd(config.git.repoName)
         })
 }
 
@@ -64,7 +52,7 @@ function repoURL() {
 function execPromise(command, props) {
     return new Promise(function(resolve, reject) {
         shjs.exec(command + ' ' + props, function(code, out, err) {
-            if (code === 1) reject(err)
+            if (code > 0) reject(err)
             resolve(out);
         })
     })
@@ -80,19 +68,24 @@ function getToken() {
 }
 
 app.post('/post/comment', function(req, res) {
-    var entry = req.body;
-    var hash = new Date().getTime().toString();
-    var distFolder = config.site.dist + entry.slug + "/";
-    var distFile = distFolder + hash + ".yml";
-    var data = "";
+    var entry = req.body,
+        hash = new Date().getTime().toString(),
+        distFolder = "./_data/" + entry.slug + "/",
+        distFile = distFolder + hash + ".yml",
+        data = "";
+
     for (var key in entry) {
-        data += key + ":" + " " + entry[key] + " \n";
+        if (key == 'email') {
+            data += key + ":" + " " + getHash(entry[key]) + " \n";
+        } else {
+            data += key + ":" + " " + entry[key] + " \n";
+        }
     }
 
-    this.fileCreation(distFolder, distFile, data)
+    fileCreation(distFolder, distFile, data)
         .then(function() {
-            this._git(distFile);
-        }.bind(this))
+            submitPullRequest(distFile);
+        })
         .then(function() {
             res.json({
                 "success": "success"
@@ -123,19 +116,29 @@ function fileCreation(distFolder, distFile, data) {
 };
 
 
-submitPullRequest = function(file) {
+function submitPullRequest(file) {
     return new Promise(function(resolve, reject) {
 
         console.log('this is a file', file);
-        var gitOrigin = repoURL()
+        var gitOrigin = repoURL(),
+            pull = config.git.remote + ' ' + config.git.branch;
 
-        exec('git pull ' + config.git.remote + ' ' + config.git.branch);
-        exec('git checkout ' + config.git.branch);
-        exec('git add ' + file);
-        exec('git commit -m  "' + config.git.commitMessage + '"');
-        exec('git push --quiet  ' + config.git.remote + ' ' + config.git.branch);
+        shjs.exec('pwd')
+        console.log(pull)
 
-        //console.log('pull request');
+        shjs.exec('git pull ' + pull);
+        shjs.exec('git checkout ' + config.git.branch);
+        shjs.exec('git add ' + file);
+        shjs.exec('git commit -m  "' + config.git.commitMessage + '"');
+        shjs.exec('git push --quiet ' + config.git.remote + ' ' + config.git.branch);
+
         res('pull request success');
     })
+}
+
+function getHash(field) {
+    return crypto
+        .createHash('md5')
+        .update(field)
+        .digest('hex')
 }
