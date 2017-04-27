@@ -5,7 +5,6 @@
         "port": "3500"
     },
     "git": {
-        "token": "",
         "username": "alancampora",
         "email": "alan.campora@gmail.com",
         "repo": "quilombodrivdev/quilombodrivdev.github.io.git",

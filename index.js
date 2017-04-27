@@ -4,20 +4,18 @@ var express = require('express'),
     mkdirp = require('mkdirp'),
     shjs = require('shelljs'),
     app = express(),
-    exec = require('sync-exec'),
     crypto = require('crypto'),
     config = require('./config.json');
-
 
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 
 app.listen(config.server.port, config.server.ip, function() {
-    console.log('server listening on:', config.server.port, config.server.ip)
+    shjs.echo('server listening on:', config.server.port, config.server.ip)
     getToken()
         .then(function(data) {
-            config.git.token = data
+            config.git['token'] = data
             clone()
         })
 });
@@ -53,7 +51,7 @@ function execPromise(command, props) {
     return new Promise(function(resolve, reject) {
         shjs.exec(command + ' ' + props, function(code, out, err) {
             if (code > 0) reject(err)
-            resolve(out);
+            resolve(out)
         })
     })
 }
@@ -61,8 +59,8 @@ function execPromise(command, props) {
 function getToken() {
     return new Promise(function(resolve, reject) {
         fs.readFile(".gittoken", 'utf8', function(err, data) {
-            if (err) reject(err);
-            resolve(data.replace(/(?:\r\n|\r|\n)/g, ''));
+            if (err) reject(err)
+            resolve(data.replace(/(?:\r\n|\r|\n)/g, ''))
         })
     });
 }
@@ -82,13 +80,16 @@ app.post('/post/comment', function(req, res) {
         }
     }
 
+
+    console.log('data received:', entry)
+
     fileCreation(distFolder, distFile, data)
         .then(function() {
-            submitPullRequest(distFile);
+            return submitPullRequest(distFile);
         })
-        .then(function() {
+        .then(function(data) {
             res.json({
-                "success": "success"
+                "success": data
             });
 
         })
@@ -119,20 +120,17 @@ function fileCreation(distFolder, distFile, data) {
 function submitPullRequest(file) {
     return new Promise(function(resolve, reject) {
 
-        console.log('this is a file', file);
         var gitOrigin = repoURL(),
             pull = config.git.remote + ' ' + config.git.branch;
 
         shjs.exec('pwd')
-        console.log(pull)
-
         shjs.exec('git pull ' + pull);
         shjs.exec('git checkout ' + config.git.branch);
         shjs.exec('git add ' + file);
         shjs.exec('git commit -m  "' + config.git.commitMessage + '"');
         shjs.exec('git push --quiet ' + config.git.remote + ' ' + config.git.branch);
 
-        res('pull request success');
+        resolve('pull success');
     })
 }
 
