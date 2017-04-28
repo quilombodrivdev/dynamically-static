@@ -20,8 +20,6 @@ app.use(bodyParser.urlencoded({
 app.listen(config.server.port, config.server.ip, function() {
     shjs.echo('server listening on:', config.server.port, config.server.ip)
 
-
-
     getToken()
         .then(function(data) {
             config.git['token'] = data
@@ -89,8 +87,7 @@ app.post('/post/comment', function(req, res) {
         }
     }
 
-
-    console.log('data received:', entry)
+    shjs.echo('data received:', entry)
 
     fileCreation(distFolder, distFile, data)
         .then(function() {
