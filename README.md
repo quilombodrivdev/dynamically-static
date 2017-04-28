@@ -6,5 +6,5 @@ Initally, this module was thought to add comments to jekyll pages, but it could 
 
 ## Arquicture
 <p align="center">
-    <img src="https://cdn.pbrd.co/images/9xmbgFhvM.png" width="500px"></img>
+    <img src="https://cdn.pbrd.co/images/9xmbgFhvM.png" width="750px"></img>
 </p>
