@@ -11,7 +11,7 @@ Initally, this module was thought to add comments to jekyll pages, but in a near
 ## Arquicture
 
 <p align="center">
-    <img src="https://cdn.pbrd.co/images/9xmbgFhvM.png" width="500px"></img>
+    <img src="https://cdn.pbrd.co/images/9xmbgFhvM.png" width="700px"></img>
 </p>
 
 ### Comments system example
