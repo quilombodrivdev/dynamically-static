@@ -7,12 +7,21 @@ var express = require('express'),
     crypto = require('crypto'),
     config = require('./config.json');
 
+init()
+
+function init() {
+    config.server.port = process.env.NODE_PORT || 3500;
+    config.server.ip = process.env.NODE_IP|| '127.0.0.1';
+}
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 
 app.listen(config.server.port, config.server.ip, function() {
     shjs.echo('server listening on:', config.server.port, config.server.ip)
+
+
+
     getToken()
         .then(function(data) {
             config.git['token'] = data
