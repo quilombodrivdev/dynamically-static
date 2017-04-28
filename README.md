@@ -14,8 +14,8 @@ Initally, this module was thought to add comments to jekyll pages, but in a near
 Our static page, in our case implemented using Jekyll, will have a form with data (name, email, comment, and any further element that it's needed to be shown). That data, will be send to medusa. Once the data is recieved, mesuda is  going to create a new file using the the following path: _data/ArticleName/timestamp.yml. 
 After that, medusa will create commit and it will pushed to a particular branch, that must be established in in the config file. 
 
-### Setup
-## Config json 
+## Setup
+### Config json 
 
 ```json
 {
@@ -36,7 +36,7 @@ After that, medusa will create commit and it will pushed to a particular branch,
 }
 ```
 
-## Git token
+### Git token
 For pushing the comments into the repository, medusa will need a gittoken. [Creating a personal token in github](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/) after that, the token should be copied inside a .gittoken file.
 
 
