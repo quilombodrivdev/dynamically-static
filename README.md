@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="https://cdn.pbrd.co/images/X9oDfxiv.png" width="200px"></img>
+</p>
+
 # Medusa!
     Adding dynamic content in your static app.
 
@@ -37,6 +41,6 @@ After that, medusa will create commit and it will pushed to a particular branch,
 ```
 
 ### Git token
-For pushing the comments into the repository, medusa will need a gittoken. [Creating a personal token in github](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/) after that, the token should be copied inside a .gittoken file.
+For pushing the comments into the repository, medusa will need a gittoken. [Creating a personal token in github](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/), after that, the token should be copied inside a .gittoken file.
 
 
