@@ -21,12 +21,15 @@ After that, this middleware will create commit that will be pushed to a particul
 ## Setup
 ### Config json 
 
+Create a .medusaconfig.json fiie with the following information
+
 ```json
 {
     "server": {
         "ip": "127.0.0.1",
         "port": "3500"
     },
+    "client: "https://clienturl.com",
     "git": {
         "username": "userame",
         "email": "youremail@domain.com",
