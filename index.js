@@ -38,12 +38,6 @@ app.post('/post/comment', function(req, res, next) {
     }
 });
 
-//{
-//"ip1":{
-//"post1":"date 1", 
-//"post2":"date 2"
-//}
-//}
 function allowedToRunRequest(req) {
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress,
         previousRequestTime, now,
