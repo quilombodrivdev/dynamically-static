@@ -46,7 +46,7 @@ app.post('/post/comment', function(req, res, next) {
 //}
 function allowedToRunRequest(req) {
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-        vpreviousRequestTime, now,
+        previousRequestTime, now,
         commentData = getCommentData(req),
         slug = commentData.slug;
 
