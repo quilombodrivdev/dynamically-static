@@ -1,16 +1,15 @@
 {
-    "repoFolder": "repo",
     "server": {
-        "ip": "",
-        "port": ""
+        "ip": "127.0.0.1",
+        "port": "3500"
     },
     "git": {
-        "username": "username",
-        "email": "username",
-        "repo": "repository",
-        "repoName": "repository-name",
-        "branch": "medusa-comments",
+        "username": "alancampora",
+        "email": "alan.campora@gmail.com",
+        "repo": "quilombodrivdev/quilombodrivdev.github.io.git",
+        "repoName": "quilombodrivdev.github.io",
+        "branch": "new-comments-test",
         "remote": "origin",
-        "commitMessage": "New comment"
+        "commitMessage": "New comment - medusa integration"
     }
 }
