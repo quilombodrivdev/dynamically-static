@@ -23,7 +23,6 @@ After that, this middleware will create commit that will be pushed to a particul
 
 ```json
 {
-    "repoFolder": "repoFolder", // it will keep the jekyll repository
     "server": {
         "ip": "127.0.0.1",
         "port": "3500"
