@@ -5,13 +5,14 @@ var express = require('express'),
     shjs = require('shelljs'),
     app = express(),
     crypto = require('crypto'),
-    config = require('./config.json');
+    config = require('./config.json'),
+    recentRequests = {};
 
 init()
 
 function init() {
     config.server.port = process.env.NODE_PORT || 3500;
-    config.server.ip = process.env.NODE_IP|| '127.0.0.1';
+    config.server.ip = process.env.NODE_IP || '127.0.0.1';
 }
 app.use(bodyParser.urlencoded({
     extended: true
@@ -26,6 +27,95 @@ app.listen(config.server.port, config.server.ip, function() {
             clone()
         })
 });
+
+app.post('/post/comment', function(req, res, next) {
+    if (allowedToRunRequest(req)) {
+        postComment(req, res)
+    } else {
+        res.status(401).send({
+            error: "not allowed"
+        });
+    }
+});
+
+//{
+//"ip1":{
+//"post1":"date 1", 
+//"post2":"date 2"
+//}
+//}
+function allowedToRunRequest(req) {
+    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+        vpreviousRequestTime, now,
+        commentData = getCommentData(req),
+        slug = commentData.slug;
+
+    shjs.echo("IP:", ip)
+    shjs.echo("RecentRequests:", recentRequests)
+
+    if (!recentRequests[ip]) {
+        recentRequests[ip] = {};
+        recentRequests[ip][slug] = new Date()
+        return true
+    }
+    if (!recentRequests[ip][slug]) {
+        recentRequests[ip][slug] = new Date()
+        return true
+    }
+
+    now = new Date()
+    previousRequestTime = recentRequests[ip][slug]
+    if (secondsOfDifference(now, previousRequestTime) > 120) {
+        recentRequests[ip][slug] = now
+        return true
+    }
+
+    return false
+
+}
+
+function secondsOfDifference(endDate, startDate) {
+    return (endDate.getTime() - startDate.getTime()) / 1000;
+}
+
+function getCommentData(req) {
+    return req.body;
+}
+
+function postComment(req, res) {
+    var entry = req.body,
+        hash = new Date().getTime().toString(),
+        distFolder = "./_data/" + entry.slug + "/",
+        distFile = distFolder + hash + ".yml",
+        data = "";
+
+    for (var key in entry) {
+        if (key == 'email') {
+            data += key + ":" + " " + getHash(entry[key]) + " \n";
+        } else {
+            data += key + ":" + " " + entry[key] + " \n";
+        }
+    }
+
+    shjs.echo('data received:', entry)
+
+    fileCreation(distFolder, distFile, data)
+        .then(function() {
+            return submitPullRequest(distFile);
+        })
+        .then(function(data) {
+            res.json({
+                "success": data
+            });
+
+        })
+        .catch(function(err) {
+            res.json({
+                "error": err
+            });
+        });
+
+}
 
 function clone() {
     shjs.cd(config.repoFolder)
@@ -71,41 +161,6 @@ function getToken() {
         })
     });
 }
-
-app.post('/post/comment', function(req, res) {
-    var entry = req.body,
-        hash = new Date().getTime().toString(),
-        distFolder = "./_data/" + entry.slug + "/",
-        distFile = distFolder + hash + ".yml",
-        data = "";
-
-    for (var key in entry) {
-        if (key == 'email') {
-            data += key + ":" + " " + getHash(entry[key]) + " \n";
-        } else {
-            data += key + ":" + " " + entry[key] + " \n";
-        }
-    }
-
-    shjs.echo('data received:', entry)
-
-    fileCreation(distFolder, distFile, data)
-        .then(function() {
-            return submitPullRequest(distFile);
-        })
-        .then(function(data) {
-            res.json({
-                "success": data
-            });
-
-        })
-        .catch(function(err) {
-            res.json({
-                "error": err
-            });
-        });
-
-});
 
 function fileCreation(distFolder, distFile, data) {
     return new Promise(function(resolve, reject) {
