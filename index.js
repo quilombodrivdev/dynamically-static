@@ -5,7 +5,7 @@ var express = require('express'),
     shjs = require('shelljs'),
     app = express(),
     crypto = require('crypto'),
-    config = require('.medusaconfig.json'),
+    config = require('./.medusaconfig.json'),
     recentRequests = {};
 
 init()
