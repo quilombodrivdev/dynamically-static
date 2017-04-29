@@ -5,19 +5,25 @@ var express = require('express'),
     shjs = require('shelljs'),
     app = express(),
     crypto = require('crypto'),
-    config = require('./config.json'),
+    config = require('.medusaconfig.json'),
     recentRequests = {};
 
 init()
 
-function init() {
+function init(req, res, next) {
     config.server.port = process.env.NODE_PORT || 3500;
     config.server.ip = process.env.NODE_IP || '127.0.0.1';
+}
+function allowCrossDomain(req, res, next) {
+    res.header('Access-Control-Allow-Origin', config.client);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
 }
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-
+app.use(allowCrossDomain);
 app.listen(config.server.port, config.server.ip, function() {
     shjs.echo('server listening on:', config.server.port, config.server.ip)
 
