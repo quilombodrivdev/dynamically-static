@@ -3,7 +3,7 @@
 </p>
 
 # Medusa!
-    Adding dynamic content in your static app.
+Adding dynamic content in your static app.
 
 ## Introduction 
 Initally, this module was thought to add comments to jekyll pages, but in a near feature, it could be also used for any static page where it's needed to add some dynamism. 
@@ -15,8 +15,8 @@ Initally, this module was thought to add comments to jekyll pages, but in a near
 </p>
 
 ### Comments system example
-Our static page, in our case implemented using Jekyll, will have a form with data (name, email, comment, and any further element that it's needed to be shown). That data, will be send to medusa. Once the data is recieved, mesuda is  going to create a new file using the the following path: _data/ArticleName/timestamp.yml. 
-After that, medusa will create commit and it will pushed to a particular branch, that must be established in in the config file. 
+Our static page, in our case implemented using Jekyll, will have a form with data (name, email, comment, and any further element that it's needed to be shown). That data, will be send to medusa. Once the data is recieved, medusa is  going to create a new file using the the following path: _data/ArticleName/timestamp.yml. 
+After that, this middleware will create commit that will be pushed to a particular branch, that must be established in in the config file. 
 
 ## Setup
 ### Config json 
