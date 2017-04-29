@@ -114,11 +114,13 @@ function postComment(req, res) {
 function clone() {
     execPromise('git', 'clone ' + repoURL())
         .then(function() {
-            shjs.echo('config user.email');
-            return execPromise('git', 'config user.email ' + config.git.email)
+            shjs.echo('cd to repo');
+            return shjs.cd(config.git.repoName);
+            shjs.exec('pwd');
         })
         .then(function() {
-            return shjs.cd(config.git.repoName);
+            shjs.echo('config user.email');
+            return execPromise('git', 'config user.email ' + config.git.email)
         })
         .then(function() {
             shjs.echo('config user.name');
