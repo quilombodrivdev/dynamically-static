@@ -118,7 +118,6 @@ function postComment(req, res) {
 }
 
 function clone() {
-    shjs.cd(config.repoFolder)
     execPromise('git', 'clone ' + repoURL())
         .then(function() {
             shjs.echo('config user.email');
