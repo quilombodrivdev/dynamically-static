@@ -32,8 +32,8 @@ app.post('/post/comment', function(req, res, next) {
     if (allowedToRunRequest(req)) {
         postComment(req, res)
     } else {
-        res.status(401).send({
-            error: "not allowed"
+        res.status(405).send({
+            error: "Method Not Allowed"
         });
     }
 });
